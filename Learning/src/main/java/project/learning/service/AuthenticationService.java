@@ -31,11 +31,11 @@ public class    AuthenticationService {
     private final UserRepository userRepository;
     @NonFinal
     @Value("${jwt.secret}")
-    protected String SINGER_KEY;
+    protected String SECRET_KEY;
 
     public VerifyTokenResponse verifyToken(VerifyTokenRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
-        JWSVerifier verifier = new MACVerifier(SINGER_KEY.getBytes());
+        JWSVerifier verifier = new MACVerifier(SECRET_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 
@@ -82,7 +82,7 @@ public class    AuthenticationService {
         JWSObject jwsObject = new JWSObject(header,payload);
 
         try {
-            jwsObject.sign(new MACSigner(SINGER_KEY.getBytes()));
+            jwsObject.sign(new MACSigner(SECRET_KEY.getBytes()));
             return jwsObject.serialize();
         } catch (JOSEException e) {
             throw new RuntimeException(e);
