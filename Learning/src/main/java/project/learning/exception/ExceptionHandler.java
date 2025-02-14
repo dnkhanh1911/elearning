@@ -11,7 +11,7 @@ public class ExceptionHandler {
     ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception){
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(ErrorCode.Unknown_Exception.getCode());
-        apiResponse.setMessage(ErrorCode.Unknown_Exception.getMessage());
+        apiResponse.setMessage(exception.getMessage());
         return ResponseEntity.badRequest().body(apiResponse);
     }
 

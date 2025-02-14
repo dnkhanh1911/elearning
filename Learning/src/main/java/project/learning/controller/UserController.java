@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import project.learning.dto.request.CreateUserRequest;
 import project.learning.dto.response.ApiResponse;
 import project.learning.dto.response.UserResponse;
-import project.learning.entity.UserEntity;
+import project.learning.entity.User;
 import project.learning.service.UserService;
 
 import java.util.List;
@@ -17,14 +17,16 @@ public class UserController {
     @Autowired
     private UserService userService;
     @PostMapping("/register")
-    ApiResponse<UserEntity> createUser(@RequestBody @Valid CreateUserRequest request){
-        ApiResponse<UserEntity> apiResponse = new ApiResponse<>();
+    ApiResponse<UserResponse> createUser(@RequestBody @Valid CreateUserRequest request){
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
         apiResponse.setResult(userService.createUser(request));
         return apiResponse;
     }
     @GetMapping
-    List<UserEntity> getUsers(){
-        return userService.getUsers();
+    ApiResponse<List<UserResponse>> getUsers(){
+        return ApiResponse.<List<UserResponse>>builder()
+                .result(userService.getUsers())
+                .build();
     }
     @GetMapping("/{id}")
     UserResponse getUser(@PathVariable int id){

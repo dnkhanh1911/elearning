@@ -1,39 +1,47 @@
 package project.learning.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import project.learning.dto.request.CreateUserRequest;
 import project.learning.dto.response.UserResponse;
-import project.learning.entity.UserEntity;
+import project.learning.entity.User;
+import project.learning.enums.Role;
 import project.learning.exception.AppException;
 import project.learning.exception.ErrorCode;
 import project.learning.mapper.UserMapper;
 import project.learning.repository.UserRepository;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private UserMapper userMapper;
-    public UserEntity createUser(CreateUserRequest request){
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
+    public UserResponse createUser(CreateUserRequest request){
 
         if(userRepository.existsByEmail(request.getEmail())){
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
 
-        UserEntity user = userMapper.toUser(request);
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User user = userMapper.toUser(request);
+
+        user.setRoleId(Role.STUDENT.name());
+
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        return userRepository.save(user);
+
+        return userMapper.toUserResponse(userRepository.save(user));
     }
 
-    public List<UserEntity> getUsers(){
-        return userRepository.findAll();
+    public List<UserResponse> getUsers(){
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
 
     public UserResponse getUser(int id){
@@ -41,7 +49,7 @@ public class UserService {
     }
 
     public UserResponse updateUser(int id, CreateUserRequest request){
-        UserEntity user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
         userMapper.updateUser(user,request);
 
         return userMapper.toUserResponse(userRepository.save(user));

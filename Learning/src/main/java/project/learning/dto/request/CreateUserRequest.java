@@ -14,7 +14,6 @@ public class CreateUserRequest {
     @Email(message = "Must be email")
     private String email;
     private String password;
-    private int roleId;
     private byte isVerify;
 
 }

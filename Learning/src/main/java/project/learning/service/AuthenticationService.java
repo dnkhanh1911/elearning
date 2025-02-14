@@ -8,14 +8,17 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import project.learning.dto.request.AuthenticationRequest;
 import project.learning.dto.request.VerifyTokenRequest;
 import project.learning.dto.response.AuthenticationResponse;
 import project.learning.dto.response.VerifyTokenResponse;
+import project.learning.entity.User;
 import project.learning.exception.AppException;
 import project.learning.exception.ErrorCode;
 import project.learning.repository.UserRepository;
@@ -24,6 +27,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +36,7 @@ public class    AuthenticationService {
     @NonFinal
     @Value("${jwt.secret}")
     protected String SECRET_KEY;
+    private final PasswordEncoder passwordEncoder;
 
     public VerifyTokenResponse verifyToken(VerifyTokenRequest request) throws JOSEException, ParseException {
         var token = request.getToken();
@@ -51,13 +56,12 @@ public class    AuthenticationService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(()-> new AppException(ErrorCode.EMAIL_NOT_EXISTED));
 
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         boolean authenticated = passwordEncoder.matches(request.getPassword(), user.getPassword());
         if(!authenticated){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
-        var token = generateToken(request.getEmail());
+        var token = generateToken(user);
 
         return AuthenticationResponse.builder()
                 .token(token)
@@ -66,15 +70,15 @@ public class    AuthenticationService {
 
     }
 
-    private String generateToken(String email){
+    private String generateToken(User user){
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(email)
+                .subject(user.getEmail())
                 .issuer("namkhanh")
                 .issueTime(new Date())
                 .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
-                .claim("customClaim", "custom")
+                .claim("scope", user.getRoleId())
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
