@@ -17,6 +17,7 @@ import project.learning.repository.UserRepository;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,6 +44,16 @@ public class UserService {
     public List<UserResponse> getUsers(){
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
+
+    public UserResponse getMyInfo(){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        User user = userRepository.findByEmail(name).orElseThrow(()->
+                new AppException(ErrorCode.EMAIL_NOT_EXISTED));
+        return userMapper.toUserResponse(user);
+    }
+
+
     @PreAuthorize("hasRole('STUDENT')")
     @PostAuthorize("returnObject.email == authentication.name")
     public UserResponse getUser(int id){

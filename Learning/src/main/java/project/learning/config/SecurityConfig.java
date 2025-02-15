@@ -32,14 +32,15 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(request ->
                 request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers(HttpMethod.GET,"/users").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET,"/users").hasAnyRole(Role.ADMIN.name(),Role.STUDENT.name())
                         .anyRequest().authenticated()
         );
         http.oauth2ResourceServer(oAuth2 ->
                 oAuth2.jwt(jwtConfigurer ->
                         jwtConfigurer.decoder(jwtDecoder())
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                )
+
+                ).authenticationEntryPoint(new JwtAuthenticationEntryPoint())
         );
 
         http.csrf(AbstractHttpConfigurer::disable);

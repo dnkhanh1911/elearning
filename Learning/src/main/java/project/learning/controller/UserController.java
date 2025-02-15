@@ -28,9 +28,18 @@ public class UserController {
                 .result(userService.getUsers())
                 .build();
     }
+
     @GetMapping("/{id}")
-    UserResponse getUser(@PathVariable int id){
-        return userService.getUser(id);
+    ApiResponse<UserResponse> getUser(@PathVariable int id){
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getUser(id))
+                .build();
+    }
+    @GetMapping("/myInfo")
+    ApiResponse<UserResponse> getMyInfo() {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
     }
     @PutMapping("/{id}")
     UserResponse updateUser(@PathVariable int id, @RequestBody CreateUserRequest request){
