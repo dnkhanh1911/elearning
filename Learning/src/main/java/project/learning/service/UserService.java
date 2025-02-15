@@ -1,6 +1,8 @@
 package project.learning.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -37,13 +39,12 @@ public class UserService {
 
         return userMapper.toUserResponse(userRepository.save(user));
     }
-
+    @PreAuthorize("hasRole('STUDENT')")
     public List<UserResponse> getUsers(){
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-
         return userRepository.findAll().stream().map(userMapper::toUserResponse).toList();
     }
-
+    @PreAuthorize("hasRole('STUDENT')")
+    @PostAuthorize("returnObject.email == authentication.name")
     public UserResponse getUser(int id){
         return userMapper.toUserResponse(userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found")));
     }
