@@ -8,7 +8,7 @@ import project.learning.dto.response.ApiResponse;
 
 @ControllerAdvice
 public class ExceptionHandler {
-    @org.springframework.web.bind.annotation.ExceptionHandler(value = Exception.class)
+    @org.springframework.web.bind.annotation.ExceptionHandler(value = RuntimeException.class)
     ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception){
         ApiResponse apiResponse = new ApiResponse();
         apiResponse.setCode(ErrorCode.Unknown_Exception.getCode());
@@ -40,6 +40,11 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse> handlingMethodArgumentNotValidException(MethodArgumentNotValidException exception){
+        if (exception.getFieldError() == null) {
+            return ResponseEntity.badRequest().body(
+                    new ApiResponse<>(ErrorCode.Unknown_Exception.getCode(), "Validation error", null)
+            );
+        }
         String enumKey = exception.getFieldError().getDefaultMessage();
         ErrorCode errorCode = ErrorCode.valueOf(enumKey);
         ApiResponse apiResponse = new ApiResponse();

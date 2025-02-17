@@ -27,11 +27,20 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
-    private final String [] PUBLIC_ENDPOINTS = {"/auth/login", "/users/register"};
+    private final String[] PUBLIC_ENDPOINTS = {
+            "/auth/login",
+            "/users/register",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/v3/api-docs",
+            "/swagger-resources/**",
+            "/webjars/**"
+    };
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(request ->
-                request.requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS).permitAll()
+                request.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll() // Cho phép Swagger
                         .requestMatchers(HttpMethod.GET,"/users").hasAnyRole(Role.ADMIN.name(),Role.STUDENT.name())
                         .anyRequest().authenticated()
         );
