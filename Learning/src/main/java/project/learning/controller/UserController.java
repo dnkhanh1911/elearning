@@ -1,6 +1,7 @@
 package project.learning.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import project.learning.dto.request.CreateUserRequest;
@@ -13,9 +14,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
     @PostMapping("/register")
     ApiResponse<UserResponse> createUser(@RequestBody @Valid CreateUserRequest request){
         ApiResponse<UserResponse> apiResponse = new ApiResponse<>();

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import project.learning.dto.request.AuthenticationRequest;
+import project.learning.dto.request.LogoutRequest;
 import project.learning.dto.request.VerifyTokenRequest;
 import project.learning.dto.response.ApiResponse;
 import project.learning.dto.response.AuthenticationResponse;
@@ -29,9 +30,17 @@ public class AuthenticationController {
     }
     @PostMapping("/token")
     ApiResponse<VerifyTokenResponse> token(@RequestBody VerifyTokenRequest request) throws ParseException, JOSEException {
-        var result = authenticationService.verifyToken(request);
+        var result = authenticationService.introspect(request);
         return ApiResponse.<VerifyTokenResponse>builder()
                 .result(result)
                 .build();
     }
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request)
+            throws ParseException, JOSEException {
+        authenticationService.logout(request);
+        return ApiResponse.<Void>builder()
+                .build();
+    }
+
 }

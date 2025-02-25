@@ -1,6 +1,6 @@
 package project.learning.config;
 
-import lombok.experimental.NonFinal;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,15 +11,10 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import project.learning.enums.Role;
-
-import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
@@ -28,14 +23,17 @@ public class SecurityConfig {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
     private final String[] PUBLIC_ENDPOINTS = {
-            "/auth/login",
+            "/auth/login","/auth/logout",
             "/users/register",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/v3/api-docs",
             "/swagger-resources/**",
-            "/webjars/**"
+            "/webjars/**",
+            "/guest/**"
     };
+    @Autowired
+    private CustomJwtDecoder customJwtDecoder;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(request ->
@@ -46,7 +44,7 @@ public class SecurityConfig {
         );
         http.oauth2ResourceServer(oAuth2 ->
                 oAuth2.jwt(jwtConfigurer ->
-                        jwtConfigurer.decoder(jwtDecoder())
+                        jwtConfigurer.decoder(customJwtDecoder)
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
 
                 ).authenticationEntryPoint(new JwtAuthenticationEntryPoint())
@@ -68,13 +66,6 @@ public class SecurityConfig {
         return converter;
     }
 
-    @Bean
-    JwtDecoder jwtDecoder(){
-        SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(),"HS512");
-        return NimbusJwtDecoder.withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
-    }
 
     @Bean
     PasswordEncoder passwordEncoder(){
