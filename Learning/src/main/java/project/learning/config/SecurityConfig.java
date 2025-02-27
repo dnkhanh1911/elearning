@@ -23,13 +23,12 @@ public class SecurityConfig {
     @Value("${jwt.secret}")
     private String SECRET_KEY;
     private final String[] PUBLIC_ENDPOINTS = {
-            "/auth/login","/auth/logout",
+            "/auth/login",
+            "/auth/logout",
             "/users/register",
+            "/auth/refresh",
             "/swagger-ui/**",
             "/v3/api-docs/**",
-            "/v3/api-docs",
-            "/swagger-resources/**",
-            "/webjars/**",
             "/guest/**"
     };
     @Autowired
@@ -38,7 +37,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
         http.authorizeHttpRequests(request ->
                 request.requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll() // Cho phép Swagger
                         .requestMatchers(HttpMethod.GET,"/users").hasAnyRole(Role.ADMIN.name(),Role.STUDENT.name())
                         .anyRequest().authenticated()
         );
