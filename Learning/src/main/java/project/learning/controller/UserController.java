@@ -23,19 +23,6 @@ public class UserController {
         apiResponse.setResult(userService.createUser(request));
         return apiResponse;
     }
-    @GetMapping
-    ApiResponse<List<UserResponse>> getUsers(){
-        return ApiResponse.<List<UserResponse>>builder()
-                .result(userService.getUsers())
-                .build();
-    }
-
-    @GetMapping("/{id}")
-    ApiResponse<UserResponse> getUser(@PathVariable int id){
-        return ApiResponse.<UserResponse>builder()
-                .result(userService.getUser(id))
-                .build();
-    }
     @GetMapping("/myInfo")
     ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()

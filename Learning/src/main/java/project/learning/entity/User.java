@@ -17,9 +17,9 @@ public class User {
     @Column(name = "user_id",nullable = false)
     private int userId;
     @Column(nullable = false, length = 200)
-    private String fullName;
+    private String full_name;
     @Column(nullable = true)
-    private Date dateOfBirth;
+    private Date date_of_birth;
     @Column(nullable = false, length = 200)
     private String email;
     @Column(nullable = true, length = 500)
@@ -35,10 +35,10 @@ public class User {
     @Column(nullable = true, length = 500)
     private String reason;
     @Column(nullable = true)
-    private Date timeBan;
+    private Date time_ban;
     @Column(nullable = true, length = 400)
     private String avatar;
     @Column(nullable = false)
-    private byte isVerify;
+    private byte is_verify;
 
 }

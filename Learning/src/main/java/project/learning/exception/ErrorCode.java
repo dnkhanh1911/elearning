@@ -11,6 +11,7 @@ public enum ErrorCode {
     EMAIL_NOT_EXISTED(1004, "Email not existed", HttpStatus.NOT_FOUND),
     UNAUTHENTICATED(1005, "Unauthenticated", HttpStatus.UNAUTHORIZED),
     UNAUTHORIZED(1006, "You do not have permission", HttpStatus.UNAUTHORIZED),
+    PASSWORD_NOT_MATCH(1006, "Password do not match", HttpStatus.EXPECTATION_FAILED),
     ;
 
     private int code;

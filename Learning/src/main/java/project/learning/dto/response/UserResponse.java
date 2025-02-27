@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Date;
 import java.util.Set;
 
 @Data
@@ -15,8 +16,11 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserResponse {
     private int userId;
-    private String fullName;
+    private String full_name;
     private String email;
     private String roleId;
-    private byte isVerify;
+    private byte is_verify;
+    private Date date_of_birth;
+    private String phone;
+    private Byte gender;
 }

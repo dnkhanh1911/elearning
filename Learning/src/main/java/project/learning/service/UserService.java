@@ -31,6 +31,8 @@ public class UserService {
         if(userRepository.existsByEmail(request.getEmail())){
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
+        if(!request.getPassword().equals(request.getConfirmPassword()))
+            throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
 
         User user = userMapper.toUser(request);
 
